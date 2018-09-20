@@ -184,7 +184,7 @@ func main() {
 
 	jsonConf := &TargetConfig {
 		//Profiles: 		[]string{os.Getenv(envProfilesPath) + "/vsphere-6.5-U1-security-configuration-guide"},
-		Profiles:		[]string{ "vsphere-6.5-U1-security-configuration-guide" },
+		Profiles:		[]string{ "inspec/vsphere-6.5-U1-security-configuration-guide" },
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
 		Password: 		"password",
@@ -201,7 +201,7 @@ func main() {
 	args := []string {}
 	args = append(args, "exec", "--json-config=-")
 
-	cd := exec.Command("cd", "/home/admini/repo")
+	/*cd := exec.Command("cd", "/home/admini/repo")
 	var serr bytes.Buffer
 	cd.Stderr = &serr
 	err = cd.Run()
@@ -212,7 +212,7 @@ func main() {
 
 	var wd string
 	wd, err = os.Getwd()
-	fmt.Printf("pwd is %s  %s", wd, err)
+	fmt.Printf("pwd is %s  %s", wd, err)*/
 
 	cmd = exec.CommandContext(ctx, "inspec", args...)
 	fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
