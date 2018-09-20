@@ -174,7 +174,7 @@ func main() {
 
 
 	jsonConf := &TargetConfig {
-		Profiles: 		[]string{envProfilesPath + "/vsphere-6.5-U1-security-configuration-guide"},
+		Profiles: 		[]string{os.Getenv(envProfilesPath) + "/vsphere-6.5-U1-security-configuration-guide"},
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
 		Password: 		"password",
