@@ -50,6 +50,7 @@ const (
 	envUserName = "GOVMOMI_USERNAME"
 	envPassword = "GOVMOMI_PASSWORD"
 	envInsecure = "GOVMOMI_INSECURE"
+	envProfilesPath = "INSPEC_PROFILES_PATH"
 )
 
 type TargetConfig struct {
@@ -173,7 +174,7 @@ func main() {
 
 
 	jsonConf := &TargetConfig {
-		Profiles: 		[]string{"inspec/vmware-6-5-update-1-security-configuration-guide-1.0.0.tar.gz"},
+		Profiles: 		[]string{envProfilesPath + "/vsphere-6.5-U1-security-configuration-guide"},
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
 		Password: 		"password",
