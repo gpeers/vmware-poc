@@ -206,7 +206,7 @@ func main() {
 	cd.Stderr = &serr
 	err = cd.Run()
 	if err != nil {
-		fmt.Println("error -> %+v", serr)
+		fmt.Println("error -> %+v", serr.String())
 		log.Fatal(err)
 	}
 
