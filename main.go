@@ -201,7 +201,7 @@ func main() {
 	args := []string {}
 	args = append(args, "exec", "--json-config=-")
 
-	cd := exec.Command("cd", "~/repo")
+	cd := exec.Command("cd", "/home/admini/repo")
 	var serr bytes.Buffer
 	cd.Stderr = &serr
 	err = cd.Run()
