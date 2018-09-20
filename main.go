@@ -201,9 +201,8 @@ func main() {
 	args := []string {}
 	args = append(args, "exec", "--json-config=-")
 
-	var move *exec.Cmd
-	move = exec.CommandContext(ctx, "cd", "~/repo")
-	err = move.Run()
+	cd := exec.Command("cd", "~/repo")
+	err = cd.Run()
 	if err != nil {
 		fmt.Println("error!")
 		log.Fatal(err)
