@@ -203,7 +203,7 @@ func main() {
 
 	cd := exec.Command("cd", "~/repo")
 	var serr bytes.Buffer
-	cmd.Stderr = &serr
+	cd.Stderr = &serr
 	err = cd.Run()
 	if err != nil {
 		fmt.Println("error -> %+v", serr)
