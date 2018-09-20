@@ -15,6 +15,9 @@ import (
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 	"text/tabwriter"
+	"os/exec"
+	"encoding/json"
+	"bytes"
 )
 
 // getEnvString returns string from environment variable.
@@ -48,6 +51,16 @@ const (
 	envPassword = "GOVMOMI_PASSWORD"
 	envInsecure = "GOVMOMI_INSECURE"
 )
+
+type TargetConfig struct {
+	Profiles	[]string		`json:"profiles,omitempty"`
+	Target 		string			`json:"target,omitempty"`
+	User 		string			`json:"user,omitempty"`
+	Password 	string 			`json:"target,omitempty"`
+	Insecure 	bool			`json:"insecure,omitempty"`
+	Reporter 	[]string		`json:"reporter,omitempty"`
+	LogLevel 	string			`json:"log-level,omitempty"`
+}
 
 var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", envURL)
 var urlFlag = flag.String("url", getEnvString(envURL, "https://username:password@host"+vim25.Path), urlDescription)
@@ -109,7 +122,7 @@ func main() {
 
 	c, err := NewClient(ctx)
 	if err != nil {
-		log.Fatal(err) MM
+		log.Fatal(err)
 	}
 
 	defer c.Logout(ctx)
@@ -148,4 +161,47 @@ func main() {
 
 	w.Flush()
 
+	// run inspec
+	fmt.Printf("\nRunning InSpec...\n\n")
+
+	var cmd *exec.Cmd
+
+	// need to discover and hit the esxi hosts; inspec doesn't run vs. vcenter
+	// Retrieve summary property for all hosts
+	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.HostSystem.html
+
+
+
+	jsonConf := &TargetConfig {
+		Profiles: 		[]string{"inspec/vmware-6-5-update-1-security-configuration-guide"},
+		Target: 		"vmware://172.16.20.43",
+		User:			"root",
+		Password: 		"password",
+		Insecure: 		true,
+		LogLevel: 		"debug",
+	}
+
+	conf, err := json.Marshal(jsonConf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	args := []string {}
+	args = append(args, "exec", "--json-config=-")
+	cmd = exec.CommandContext(ctx, "inspec", args...)
+	fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
+	cmd.Stdin = bytes.NewBuffer(conf)
+
+	fmt.Printf("Running: echo '%+v' | inspec %s", jsonConf, strings.Join(args, " "))
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+	if err != nil {
+		log.Fatal(stderr.String())
+	}
+
+	fmt.Println(cmd.Stdout)
 }
