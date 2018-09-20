@@ -202,9 +202,11 @@ func main() {
 	args = append(args, "exec", "--json-config=-")
 
 	cd := exec.Command("cd", "~/repo")
+	var serr bytes.Buffer
+	cmd.Stderr = &serr
 	err = cd.Run()
 	if err != nil {
-		fmt.Println("error!")
+		fmt.Println("error -> %+v", serr)
 		log.Fatal(err)
 	}
 
