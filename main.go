@@ -201,6 +201,7 @@ func main() {
 
 	err = cmd.Run()
 	if err != nil {
+		fmt.Println("error!")
 		log.Fatal(stderr.String())
 	}
 
