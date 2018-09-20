@@ -54,14 +54,13 @@ const (
 )
 
 type TargetConfig struct {
-	Profiles	[]string		`json:"profiles,omitempty"`
-	Target 		string			`json:"target,omitempty"`
-	User 		string			`json:"user,omitempty"`
-	Password 	string 			`json:"target,omitempty"`
-	Insecure 	bool			`json:"insecure,omitempty"`
-	//Reporter 	[]Reporter		`json:"reporter,omitempty"`
-	Reporter 	map[string]map[string]bool 	`json:"reporter,omitempty"`
-	LogLevel 	string			`json:"log-level,omitempty"`
+	Profiles	[]string						`json:"profiles,omitempty"`
+	Target 		string							`json:"target,omitempty"`
+	User 		string							`json:"user,omitempty"`
+	Password 	string 							`json:"target,omitempty"`
+	Insecure 	bool							`json:"insecure,omitempty"`
+	Reporter 	map[string]map[string]string 	`json:"reporter,omitempty"`
+	LogLevel 	string							`json:"log-level,omitempty"`
 }
 
 /*
@@ -176,6 +175,12 @@ func main() {
 	// need to discover and hit the esxi hosts; inspec doesn't run vs. vcenter
 	// Retrieve summary property for all hosts
 	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.HostSystem.html
+	var reporter = map[string]map[string]string{}
+	reporter["cli"] = map[string]string{}
+	reporter["json"] = map[string]string{}
+	reporter["cli"]["stdout"] = "true"
+	reporter["json"]["file"] = "~/go/src/github.com/gpeers/vmware-poc/output.json"
+	reporter["json"]["stdout"] = "false"
 
 	jsonConf := &TargetConfig {
 		Profiles: 		[]string{os.Getenv(envProfilesPath) + "/vsphere-6.5-U1-security-configuration-guide"},
@@ -184,7 +189,7 @@ func main() {
 		Password: 		"password",
 		Insecure: 		true,
 		LogLevel: 		"debug",
-		//Reporter: 		[]string{"json:-"},
+		Reporter: 		reporter,
 	}
 
 	conf, err := json.Marshal(jsonConf)
