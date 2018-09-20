@@ -180,7 +180,7 @@ func main() {
 		Password: 		"password",
 		Insecure: 		true,
 		LogLevel: 		"debug",
-		Reporter: 		[]string{"json"},
+		Reporter: 		[]string{"json:-"},
 	}
 
 	conf, err := json.Marshal(jsonConf)
