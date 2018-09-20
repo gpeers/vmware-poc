@@ -210,7 +210,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("pwd is %s  ", os.Getwd())
+	var wd string
+	wd, err = os.Getwd()
+	fmt.Printf("pwd is %s  %s", wd, err)
 
 	cmd = exec.CommandContext(ctx, "inspec", args...)
 	fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
