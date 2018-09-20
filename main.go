@@ -59,9 +59,15 @@ type TargetConfig struct {
 	User 		string			`json:"user,omitempty"`
 	Password 	string 			`json:"target,omitempty"`
 	Insecure 	bool			`json:"insecure,omitempty"`
-	Reporter 	[]string		`json:"reporter,omitempty"`
+	//Reporter 	[]Reporter		`json:"reporter,omitempty"`
+	Reporter 	map[string]map[string]bool 	`json:"reporter,omitempty"`
 	LogLevel 	string			`json:"log-level,omitempty"`
 }
+
+/*
+map[string][map[string][map[string][bool]]]
+{"reporter": { "cli" : {"stdout" : true}, "json" : { "file" : "/tmp/output.json", "stdout" : false } }}
+ */
 
 var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", envURL)
 var urlFlag = flag.String("url", getEnvString(envURL, "https://username:password@host"+vim25.Path), urlDescription)
@@ -171,8 +177,6 @@ func main() {
 	// Retrieve summary property for all hosts
 	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.HostSystem.html
 
-
-
 	jsonConf := &TargetConfig {
 		Profiles: 		[]string{os.Getenv(envProfilesPath) + "/vsphere-6.5-U1-security-configuration-guide"},
 		Target: 		"vmware://172.16.20.43",
@@ -180,7 +184,8 @@ func main() {
 		Password: 		"password",
 		Insecure: 		true,
 		LogLevel: 		"debug",
-		Reporter: 		[]string{"json:-"},
+		//Reporter: 		[]string{"json:-"},
+		Reporter: 		[][]
 	}
 
 	conf, err := json.Marshal(jsonConf)
