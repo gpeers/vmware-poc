@@ -179,7 +179,7 @@ func main() {
 	reporter["cli"] = map[string]string{}
 	reporter["json"] = map[string]string{}
 	reporter["cli"]["stdout"] = "true"
-	reporter["json"]["file"] = "~/go/src/github.com/gpeers/vmware-poc/output.json"
+	reporter["json"]["file"] = "output.json"
 	reporter["json"]["stdout"] = "false"
 
 	jsonConf := &TargetConfig {
