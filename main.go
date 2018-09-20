@@ -185,7 +185,6 @@ func main() {
 		Insecure: 		true,
 		LogLevel: 		"debug",
 		//Reporter: 		[]string{"json:-"},
-		Reporter: 		[][]
 	}
 
 	conf, err := json.Marshal(jsonConf)
