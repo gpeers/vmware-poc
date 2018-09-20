@@ -173,7 +173,7 @@ func main() {
 
 
 	jsonConf := &TargetConfig {
-		Profiles: 		[]string{"vsphere-6.5-U1-security-configuration-guide"},
+		Profiles: 		[]string{"inspec/vmware-6-5-update-1-security-configuration-guide-1.0.0.tar.gz"},
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
 		Password: 		"password",
