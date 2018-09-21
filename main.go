@@ -191,7 +191,7 @@ func main() {
 	}
 
 	args := []string {}
-	args = append(args, "exec", "vsphere-6.5-U1-security-configuration-guide", "--json-config=-")
+	args = append(args, "exec", "inspec/vsphere-6.5-U1-security-configuration-guide", "--json-config=-")
 
 	cmd = exec.CommandContext(ctx, "inspec", args...)
 	fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
