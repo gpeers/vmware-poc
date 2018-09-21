@@ -54,19 +54,14 @@ const (
 )
 
 type TargetConfig struct {
-	Profiles	[]string						`json:"profiles,omitempty"`
-	Target 		string							`json:"target,omitempty"`
-	User 		string							`json:"user,omitempty"`
-	Password 	string 							`json:"target,omitempty"`
-	Insecure 	bool							`json:"insecure,omitempty"`
-	Reporter 	map[string]map[string]string 	`json:"reporter,omitempty"`
-	LogLevel 	string							`json:"log-level,omitempty"`
+	Profiles	[]string							`json:"profiles,omitempty"`
+	Target 		string								`json:"target,omitempty"`
+	User 		string								`json:"user,omitempty"`
+	Password 	string 								`json:"target,omitempty"`
+	Insecure 	bool								`json:"insecure,omitempty"`
+	Reporter 	map[string]map[string]interface{} 	`json:"reporter,omitempty"`
+	LogLevel 	string								`json:"log-level,omitempty"`
 }
-
-/*
-map[string][map[string][map[string][bool]]]
-{"reporter": { "cli" : {"stdout" : true}, "json" : { "file" : "/tmp/output.json", "stdout" : false } }}
- */
 
 var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", envURL)
 var urlFlag = flag.String("url", getEnvString(envURL, "https://username:password@host"+vim25.Path), urlDescription)
@@ -175,15 +170,14 @@ func main() {
 	// need to discover and hit the esxi hosts; inspec doesn't run vs. vcenter
 	// Retrieve summary property for all hosts
 	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.HostSystem.html
-	var reporter = map[string]map[string]string{}
-	reporter["cli"] = map[string]string{}
-	reporter["json"] = map[string]string{}
-	reporter["cli"]["stdout"] = "true"
+	var reporter = map[string]map[string]interface{}{}
+	reporter["cli"] = map[string]interface{}{}
+	reporter["json"] = map[string]interface{}{}
+	reporter["cli"]["stdout"] = true
 	reporter["json"]["file"] = "output.json"
-	reporter["json"]["stdout"] = "false"
+	reporter["json"]["stdout"] = false
 
 	jsonConf := &TargetConfig {
-		//Profiles: 		[]string{os.Getenv(envProfilesPath) + "/vsphere-6.5-U1-security-configuration-guide"},
 		Profiles:		[]string{ "inspec/vsphere-6.5-U1-security-configuration-guide" },
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
@@ -201,19 +195,6 @@ func main() {
 	args := []string {}
 	args = append(args, "exec", "--json-config=-")
 
-	/*cd := exec.Command("cd", "/home/admini/repo")
-	var serr bytes.Buffer
-	cd.Stderr = &serr
-	err = cd.Run()
-	if err != nil {
-		fmt.Println("error -> %+v", serr.String())
-		log.Fatal(err)
-	}
-
-	var wd string
-	wd, err = os.Getwd()
-	fmt.Printf("pwd is %s  %s", wd, err)*/
-
 	cmd = exec.CommandContext(ctx, "inspec", args...)
 	fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
 	cmd.Stdin = bytes.NewBuffer(conf)
@@ -226,7 +207,6 @@ func main() {
 
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("error!")
 		log.Fatal(stderr.String())
 	}
 
