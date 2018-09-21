@@ -54,7 +54,6 @@ const (
 )
 
 type TargetConfig struct {
-	Profiles	[]string							`json:"profiles,omitempty"`
 	Target 		string								`json:"target,omitempty"`
 	User 		string								`json:"user,omitempty"`
 	Password 	string 								`json:"target,omitempty"`
@@ -178,7 +177,6 @@ func main() {
 	reporter["json"]["stdout"] = false
 
 	jsonConf := &TargetConfig {
-		Profiles:		[]string{ "vsphere-6.5-U1-security-configuration-guide" },
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
 		Password: 		"password",
@@ -193,7 +191,7 @@ func main() {
 	}
 
 	args := []string {}
-	args = append(args, "exec", "--json-config=-")
+	args = append(args, "exec", "vsphere-6.5-U1-security-configuration-guide", "--json-config=-")
 
 	cmd = exec.CommandContext(ctx, "inspec", args...)
 	fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
