@@ -178,7 +178,7 @@ func main() {
 	reporter["json"]["stdout"] = false
 
 	jsonConf := &TargetConfig {
-		Profiles:		[]string{ "inspec/vsphere-6.5-U1-security-configuration-guide/vmware-6-5-update-1-security-configuration-guide" },
+		Profiles:		[]string{ "vsphere-6.5-U1-security-configuration-guide" },
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
 		Password: 		"password",
