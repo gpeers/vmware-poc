@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"bytes"
 	"github.com/vmware/govmomi/find"
-	"github.com/vmware/govmomi/property"
 )
 
 // getEnvString returns string from environment variable.
