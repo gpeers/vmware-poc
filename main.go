@@ -162,6 +162,35 @@ func main() {
 
 	w.Flush()
 
+        // get esxi hosts
+        fmt.Println("\nGetting hosts...\n")
+        f := find.NewFinder(c.Client, true)
+        dc, err := f.DatacenterOrDefault(ctx, "*")
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	f.SetDatacenter(dc)
+
+        hosts, err := f.HostSystemList(ctx, "*")
+        if err != nil {
+                log.Fatal(err)
+        }
+                
+        fmt.Printf("there are %d hosts\n", len(hosts))
+        
+        
+        for _, h := range hosts {
+                //hvms, err := v.Find(ctx, []{"VirtualMachine"}, property.Filter{"parent.": clusterName})
+                fmt.Printf("host inventory path -> %v", h.InventoryPath)
+                hvms, err := f.VirtualMachineList(ctx, h.InventoryPath)
+                if err != nil {
+                        log.Fatal(err)
+                }
+                        
+                fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
+        }
+
 	// run inspec
 	fmt.Printf("\nRunning InSpec...\n\n")
 
@@ -209,26 +238,5 @@ func main() {
 		log.Fatal(stderr.String())
 	}
 
-	fmt.Println(cmd.Stdout)
-
-	// get esxi hosts
-	f := find.NewFinder(c.Client, true)
-	hosts, err := f.HostSystemList(ctx, "*")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("there are %d hosts", len(hosts))
-
-
-	for _, h := range hosts {
-		//hvms, err := v.Find(ctx, []{"VirtualMachine"}, property.Filter{"parent.": clusterName})
-		fmt.Printf("host inventory path -> %v", h.InventoryPath)
-		hvms, err := f.VirtualMachineList(ctx, h.InventoryPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
-	}
+	//fmt.Println(out.String())
 }
