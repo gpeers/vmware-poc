@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"github.com/vmware/govmomi/find"
+	"github.com/vmware/govmomi/property"
 )
 
 // getEnvString returns string from environment variable.
@@ -162,45 +163,7 @@ func main() {
 
 	w.Flush()
 
-	// get esxi hosts
-	fmt.Println("\nGetting hosts...\n")
-	f := find.NewFinder(c.Client, true)
-	dc, err := f.DatacenterOrDefault(ctx, "*")
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	f.SetDatacenter(dc)
-
-        hosts, err := f.HostSystemList(ctx, "*")
-        if err != nil {
-                log.Fatal(err)
-        }
-                
-        fmt.Printf("there are %d hosts\n", len(hosts))
-        
-        
-        for _, h := range hosts {
-                fmt.Printf("host inventory path -> %v\n", h.InventoryPath)
-                // don't mess with jj's management server!
-                if !strings.Contains(h.InventoryPath, "172.16.20.44") {
-					hvms, err := f.VirtualMachineList(ctx, h.InventoryPath + "/*")
-					if err != nil {
-						log.Fatal(err)
-					}
-
-					fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
-				}
-        }
-
-	// run inspec
-	fmt.Printf("\nRunning InSpec...\n\n")
-
-	var cmd *exec.Cmd
-
-	// need to discover and hit the esxi hosts; inspec doesn't run vs. vcenter
-	// Retrieve summary property for all hosts
-	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.HostSystem.html
+	// set up InSpec reporter
 	var reporter = map[string]map[string]interface{}{}
 	reporter["cli"] = map[string]interface{}{}
 	reporter["json"] = map[string]interface{}{}
@@ -208,6 +171,115 @@ func main() {
 	reporter["json"]["file"] = "output.json"
 	reporter["json"]["stdout"] = false
 
+	// get esxi hosts
+	fmt.Println("\nGetting hosts...\n")
+	f := find.NewFinder(c.Client, true)
+	pc := property.DefaultCollector(c.Client)
+
+	dc, err := f.DatacenterOrDefault(ctx, "*")
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	f.SetDatacenter(dc)
+
+	hosts, err := f.HostSystemList(ctx, "*")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("there are %d hosts\n", len(hosts))
+
+	var targets []TargetConfig
+
+	for _, h := range hosts {
+		fmt.Printf("host inventory path -> %v\n", h.InventoryPath)
+		// don't mess with jj's management server!
+		if !strings.Contains(h.InventoryPath, "172.16.20.44") {
+			hvms, err := f.VirtualMachineList(ctx, h.InventoryPath + "/*")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
+
+			/*vmProps, err := vsphere.GetVirtualMachinesProperties(ctx, pc, vms)
+			if err != nil {
+				log.Errorf("Virtual machines properties errors: %s", err)
+				return
+			}
+			for _, prop := range vmProps {
+				s := prop.Summary
+				log.Infof("======= VM ==========")
+				log.Infof("Name: %s", s.Config.Name)
+				// log.Infof("Path: %s", o.InventoryPath)
+				log.Infof("UUID: %s", s.Config.Uuid)
+				log.Infof("Guest name: %s", s.Config.GuestFullName)
+				log.Infof("Memory: %dMB", s.Config.MemorySizeMB)
+				log.Infof("CPU: %d vCPU(s)", s.Config.NumCpu)
+				log.Infof("Power state: %s", s.Runtime.PowerState)
+				log.Infof("Boot time: %s", s.Runtime.BootTime)
+				log.Infof("IP address: %s", s.Guest.IpAddress)
+			}*/
+
+
+			for _, hvm := range hvms {
+				ips := []string{}
+				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.IPAddress"}, &ips)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Printf("ip -> %s \n", ips[0])
+
+				t := TargetConfig {
+					Target: 	ips[0],
+					User: 		"root",
+					Password: 	"password",
+					Insecure: 	true,
+					Reporter: 	reporter,
+					LogLevel: 	"debug",
+				}
+
+				targets = append(targets, t)
+			}
+		}
+	}
+    // run inspec on host vms
+    fmt.Println("\nRunning InSpec on host's vms...")
+	for _, t := range targets {
+		conf, err := json.Marshal(t)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var cmd *exec.Cmd
+		args := []string{}
+		args = append(args, "exec", "inspec/vsphere-6.5-U1-security-configuration-guide", "--json-config=-")
+
+		cmd = exec.CommandContext(ctx, "inspec", args...)
+		fmt.Printf("config -> %s", bytes.NewBuffer(conf).String())
+		cmd.Stdin = bytes.NewBuffer(conf)
+
+		fmt.Printf("Running: echo '%+v' | inspec %s", t, strings.Join(args, " "))
+		var out bytes.Buffer
+		var stderr bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = &stderr
+
+		err = cmd.Run()
+		if err != nil {
+			log.Fatal(stderr.String())
+		}
+	}
+
+	// run inspec
+	fmt.Printf("\nRunning InSpec on host...\n\n")
+
+	var cmd *exec.Cmd
+
+	// need to discover and hit the esxi hosts; inspec doesn't run vs. vcenter
+	// Retrieve summary property for all hosts
+	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.HostSystem.html
 	jsonConf := &TargetConfig {
 		Target: 		"vmware://172.16.20.43",
 		User:			"root",
@@ -222,7 +294,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	args := []string {}
+	args := []string{}
 	args = append(args, "exec", "inspec/vsphere-6.5-U1-security-configuration-guide", "--json-config=-")
 
 	cmd = exec.CommandContext(ctx, "inspec", args...)
