@@ -223,16 +223,16 @@ func main() {
 
 
 			for _, hvm := range hvms {
-				ips := []string{}
-				err := hvm.Properties(ctx, hvm.Reference(), []string{"Guest.IpAddress"}, &ips)
+				var summaries []mo.VirtualMachine
+				err := hvm.Properties(ctx, hvm.Reference(), []string{"summary"}, &summaries)
 				if err != nil {
 					log.Fatal(err)
 				}
 
-				fmt.Printf("ip -> %s \n", ips[0])
+				fmt.Printf("ip -> %s \n", summaries[0].Guest.IpAddress)
 
 				t := TargetConfig {
-					Target: 	ips[0],
+					Target: 	summaries[0].Guest.IpAddress,
 					User: 		"root",
 					Password: 	"password",
 					Insecure: 	true,
