@@ -18,6 +18,7 @@ import (
 	"os/exec"
 	"encoding/json"
 	"bytes"
+	"github.com/vmware/govmomi/find"
 )
 
 // getEnvString returns string from environment variable.
@@ -209,4 +210,22 @@ func main() {
 	}
 
 	fmt.Println(cmd.Stdout)
+
+	// get esxi hosts
+	f := find.NewFinder(c.Client, true)
+	hosts, err := f.HostSystemList(ctx, "*")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, h := range hosts {
+		//hvms, err := v.Find(ctx, []{"VirtualMachine"}, property.Filter{"parent.": clusterName})
+		fmt.Printf("host inventory path -> %v", h.InventoryPath)
+		hvms, err := f.VirtualMachineList(ctx, h.InventoryPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
+	}
 }
