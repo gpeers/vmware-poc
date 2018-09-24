@@ -162,10 +162,10 @@ func main() {
 
 	w.Flush()
 
-        // get esxi hosts
-        fmt.Println("\nGetting hosts...\n")
-        f := find.NewFinder(c.Client, true)
-        dc, err := f.DatacenterOrDefault(ctx, "*")
+	// get esxi hosts
+	fmt.Println("\nGetting hosts...\n")
+	f := find.NewFinder(c.Client, true)
+	dc, err := f.DatacenterOrDefault(ctx, "*")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -184,7 +184,12 @@ func main() {
                 fmt.Printf("host inventory path -> %v\n", h.InventoryPath)
                 // don't mess with jj's management server!
                 if !strings.Contains(h.InventoryPath, "172.16.20.44") {
-					hvms, err := f.VirtualMachineList(ctx, h.InventoryPath)
+                	n, err := h.ObjectName(ctx)
+                	if err != nil {
+                		log.Fatal(err)
+					}
+
+					hvms, err := f.VirtualMachineList(ctx, n + "/*")
 					if err != nil {
 						log.Fatal(err)
 					}
