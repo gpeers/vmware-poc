@@ -239,6 +239,7 @@ func main() {
 				// we only want to run against vms that are powered on (which takes
 				// care of templates as well bc they can't be powered on)
 				if ps == types.VirtualMachinePowerStatePoweredOn {
+					fmt.Println("vm is powered on...")
 					fmt.Printf("ip -> %s \n", summaries[0].Guest.IpAddress)
 
 					t := TargetConfig{
