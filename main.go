@@ -174,7 +174,7 @@ func main() {
 	// get esxi hosts
 	fmt.Println("\nGetting hosts...\n")
 	f := find.NewFinder(c.Client, true)
-	pc := property.DefaultCollector(c.Client)
+	//pc := property.DefaultCollector(c.Client)
 
 	dc, err := f.DatacenterOrDefault(ctx, "*")
 	if err != nil {
