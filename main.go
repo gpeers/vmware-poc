@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"github.com/vmware/govmomi/find"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 // getEnvString returns string from environment variable.
@@ -229,18 +230,28 @@ func main() {
 					log.Fatal(err)
 				}
 
-				fmt.Printf("ip -> %s \n", summaries[0].Guest.IpAddress)
-
-				t := TargetConfig {
-					Target: 	summaries[0].Guest.IpAddress,
-					User: 		"root",
-					Password: 	"password",
-					Insecure: 	true,
-					Reporter: 	reporter,
-					LogLevel: 	"debug",
+				// if vm is powered on
+				ps, err := hvm.PowerState(ctx)
+				if err != nil {
+					log.Fatal(err)
 				}
 
-				targets = append(targets, t)
+				// we only want to run against vms that are powered on (which takes
+				// care of templates as well bc they can't be powered on)
+				if ps == types.VirtualMachinePowerStatePoweredOn {
+					fmt.Printf("ip -> %s \n", summaries[0].Guest.IpAddress)
+
+					t := TargetConfig{
+						Target:   summaries[0].Guest.IpAddress,
+						User:     "root",
+						Password: "password",
+						Insecure: true,
+						Reporter: reporter,
+						LogLevel: "debug",
+					}
+
+					targets = append(targets, t)
+				}
 			}
 		}
 	}
