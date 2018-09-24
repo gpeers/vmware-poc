@@ -218,6 +218,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fmt.Printf("there are %d hosts", len(hosts))
+
+
 	for _, h := range hosts {
 		//hvms, err := v.Find(ctx, []{"VirtualMachine"}, property.Filter{"parent.": clusterName})
 		fmt.Printf("host inventory path -> %v", h.InventoryPath)
