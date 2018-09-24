@@ -184,12 +184,7 @@ func main() {
                 fmt.Printf("host inventory path -> %v\n", h.InventoryPath)
                 // don't mess with jj's management server!
                 if !strings.Contains(h.InventoryPath, "172.16.20.44") {
-                	n, err := h.ObjectName(ctx)
-                	if err != nil {
-                		log.Fatal(err)
-					}
-
-					hvms, err := f.VirtualMachineList(ctx, n + "/*")
+					hvms, err := f.VirtualMachineList(ctx, h.InventoryPath + "/*")
 					if err != nil {
 						log.Fatal(err)
 					}
