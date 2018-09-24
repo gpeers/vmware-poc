@@ -224,7 +224,7 @@ func main() {
 
 			for _, hvm := range hvms {
 				ips := []string{}
-				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.IPAddress"}, &ips)
+				err := hvm.Properties(ctx, hvm.Reference(), []string{"Guest.IpAddress"}, &ips)
 				if err != nil {
 					log.Fatal(err)
 				}
