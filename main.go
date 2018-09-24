@@ -181,14 +181,16 @@ func main() {
         
         
         for _, h := range hosts {
-                //hvms, err := v.Find(ctx, []{"VirtualMachine"}, property.Filter{"parent.": clusterName})
-                fmt.Printf("host inventory path -> %v", h.InventoryPath)
-                hvms, err := f.VirtualMachineList(ctx, h.InventoryPath)
-                if err != nil {
-                        log.Fatal(err)
-                }
-                        
-                fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
+                fmt.Printf("host inventory path -> %v\n", h.InventoryPath)
+                // don't mess with jj's management server!
+                if !strings.Contains(h.InventoryPath, "172.16.20.44") {
+					hvms, err := f.VirtualMachineList(ctx, h.InventoryPath)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					fmt.Printf("there are %d vms for host %s", len(hvms), h.Name())
+				}
         }
 
 	// run inspec
