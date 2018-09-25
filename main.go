@@ -221,7 +221,8 @@ func main() {
 				log.Infof("IP address: %s", s.Guest.IpAddress)
 			}*/
 
-			for i, hvm := range hvms {
+			var count int
+			for _, hvm := range hvms {
 				var data mo.VirtualMachine
 				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.ipAddress"}, &data)
 				if err != nil {
@@ -241,7 +242,9 @@ func main() {
 				if ps == types.VirtualMachinePowerStatePoweredOn {
 					fmt.Println("vm is powered on...")
 					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
-					vmReporter["json"]["file"] = "output" + strconv.Itoa(i) + ".json"
+					count = count + 1
+					fmt.Printf("vm number -> %d\n", count)
+					vmReporter["json"]["file"] = "output" + strconv.Itoa(count) + ".json"
 
 					t := TargetConfig{
 						Target:   data.Guest.IpAddress,
