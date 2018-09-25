@@ -260,7 +260,7 @@ func main() {
 	}
 
     // run inspec on host vms
-    fmt.Println("\nRunning InSpec on host's vms... %d targets\n", len(targets))
+    fmt.Printf("\nRunning InSpec on all hosts' vms... %d targets\n", len(targets))
 	for _, t := range targets {
 		conf, err := json.Marshal(t)
 		if err != nil {
