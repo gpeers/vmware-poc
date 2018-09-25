@@ -187,8 +187,8 @@ func main() {
 	vmReporter["cli"] = map[string]interface{}{}
 	vmReporter["json"] = map[string]interface{}{}
 	vmReporter["cli"]["stdout"] = true
-	vmReporter["json"]["file"] = "output.json"
-	vmReporter["json"]["stdout"] = false
+	vmReporter["json-min"]["file"] = "output.json"
+	vmReporter["json-min"]["stdout"] = false
 	var targets []TargetConfig
 
 	var count int
