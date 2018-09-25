@@ -244,7 +244,7 @@ func main() {
 					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
 					count = count + 1
 					fmt.Printf("vm number -> %d\n", count)
-					vmReporter["json"]["file"] = "output" + strconv.Itoa(count) + ".json"
+					vmReporter["json-min"]["file"] = "output" + strconv.Itoa(count) + ".json"
 
 					t := TargetConfig{
 						Target:   data.Guest.IpAddress,
