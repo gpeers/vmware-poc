@@ -224,13 +224,13 @@ func main() {
 
 
 			for _, hvm := range hvms {
-				var ips []string
-				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.ipAddress"}, &ips)
+				var data mo.VirtualMachine
+				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.ipAddress"}, &data)
 				if err != nil {
 					log.Fatal(err)
 				}
 
-				fmt.Printf("ips -> %+v\n", ips)
+				fmt.Printf("vm data -> %+v\n", data)
 
 				// if vm is powered on
 				ps, err := hvm.PowerState(ctx)
@@ -242,10 +242,10 @@ func main() {
 				// care of templates as well bc they can't be powered on)
 				if ps == types.VirtualMachinePowerStatePoweredOn {
 					fmt.Println("vm is powered on...")
-					fmt.Printf("ip -> %s \n", ips[0])
+					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
 
 					t := TargetConfig{
-						Target:   ips[0],
+						Target:   data.Guest.IpAddress,
 						User:     "root",
 						Password: "password",
 						Insecure: true,
