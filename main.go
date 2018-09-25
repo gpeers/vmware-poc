@@ -182,13 +182,7 @@ func main() {
 	}
 
 	fmt.Printf("there are %d hosts\n", len(hosts))
-	// set up InSpec reporter
-	var vmReporter = map[string]map[string]interface{}{}
-	vmReporter["cli"] = map[string]interface{}{}
-	vmReporter["progress"] = map[string]interface{}{}
-	vmReporter["cli"]["stdout"] = true
-	vmReporter["progress"]["file"] = "output.json"
-	vmReporter["progress"]["stdout"] = false
+
 	var targets []TargetConfig
 
 	var count int
@@ -244,7 +238,13 @@ func main() {
 					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
 					count = count + 1
 					fmt.Printf("vm number -> %d\n", count)
-					vmReporter["progress"]["file"] = "output" + strconv.Itoa(count) + ".json"
+					// set up InSpec reporter
+					var vmReporter = map[string]map[string]interface{}{}
+					vmReporter["cli"] = map[string]interface{}{}
+					vmReporter["documentation"] = map[string]interface{}{}
+					vmReporter["cli"]["stdout"] = true
+					vmReporter["documentation"]["file"] = "vm" + strconv.Itoa(count) + ".json"
+					vmReporter["documentation"]["stdout"] = false
 
 					t := TargetConfig{
 						Target:   data.Guest.IpAddress,
