@@ -191,6 +191,7 @@ func main() {
 	vmReporter["json"]["stdout"] = false
 	var targets []TargetConfig
 
+	var count int
 	for _, h := range hosts {
 		fmt.Printf("host inventory path -> %v\n", h.InventoryPath)
 		// don't mess with jj's management server!
@@ -221,7 +222,6 @@ func main() {
 				log.Infof("IP address: %s", s.Guest.IpAddress)
 			}*/
 
-			var count int
 			for _, hvm := range hvms {
 				var data mo.VirtualMachine
 				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.ipAddress"}, &data)
