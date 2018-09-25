@@ -163,14 +163,6 @@ func main() {
 
 	w.Flush()
 
-	// set up InSpec reporter
-	var reporter = map[string]map[string]interface{}{}
-	reporter["cli"] = map[string]interface{}{}
-	reporter["json"] = map[string]interface{}{}
-	reporter["cli"]["stdout"] = true
-	reporter["json"]["file"] = "output.json"
-	reporter["json"]["stdout"] = false
-
 	// get esxi hosts
 	fmt.Println("\nGetting hosts...\n")
 	f := find.NewFinder(c.Client, true)
@@ -189,7 +181,13 @@ func main() {
 	}
 
 	fmt.Printf("there are %d hosts\n", len(hosts))
-
+	// set up InSpec reporter
+	var vmReporter = map[string]map[string]interface{}{}
+	vmReporter["cli"] = map[string]interface{}{}
+	vmReporter["json"] = map[string]interface{}{}
+	vmReporter["cli"]["stdout"] = true
+	vmReporter["json"]["file"] = "output.json"
+	vmReporter["json"]["stdout"] = false
 	var targets []TargetConfig
 
 	for _, h := range hosts {
@@ -222,8 +220,7 @@ func main() {
 				log.Infof("IP address: %s", s.Guest.IpAddress)
 			}*/
 
-
-			for _, hvm := range hvms {
+			for i, hvm := range hvms {
 				var data mo.VirtualMachine
 				err := hvm.Properties(ctx, hvm.Reference(), []string{"guest.ipAddress"}, &data)
 				if err != nil {
@@ -243,13 +240,14 @@ func main() {
 				if ps == types.VirtualMachinePowerStatePoweredOn {
 					fmt.Println("vm is powered on...")
 					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
+					vmReporter["json"]["file"] = "output" + string(i) + ".json"
 
 					t := TargetConfig{
 						Target:   data.Guest.IpAddress,
 						User:     "root",
 						Password: "password",
 						Insecure: true,
-						Reporter: reporter,
+						Reporter: vmReporter,
 						LogLevel: "debug",
 					}
 
@@ -288,6 +286,14 @@ func main() {
 
 	// run inspec
 	fmt.Printf("\nRunning InSpec on host...\n\n")
+
+	// set up InSpec reporter
+	var reporter = map[string]map[string]interface{}{}
+	reporter["cli"] = map[string]interface{}{}
+	reporter["json"] = map[string]interface{}{}
+	reporter["cli"]["stdout"] = true
+	reporter["json"]["file"] = "output.json"
+	reporter["json"]["stdout"] = false
 
 	var cmd *exec.Cmd
 
