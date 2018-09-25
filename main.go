@@ -185,10 +185,10 @@ func main() {
 	// set up InSpec reporter
 	var vmReporter = map[string]map[string]interface{}{}
 	vmReporter["cli"] = map[string]interface{}{}
-	vmReporter["json-min"] = map[string]interface{}{}
+	vmReporter["progress"] = map[string]interface{}{}
 	vmReporter["cli"]["stdout"] = true
-	vmReporter["json-min"]["file"] = "output.json"
-	vmReporter["json-min"]["stdout"] = false
+	vmReporter["progress"]["file"] = "output.json"
+	vmReporter["progress"]["stdout"] = false
 	var targets []TargetConfig
 
 	var count int
@@ -244,7 +244,7 @@ func main() {
 					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
 					count = count + 1
 					fmt.Printf("vm number -> %d\n", count)
-					vmReporter["json-min"]["file"] = "output" + strconv.Itoa(count) + ".json"
+					vmReporter["progress"]["file"] = "output" + strconv.Itoa(count) + ".json"
 
 					t := TargetConfig{
 						Target:   data.Guest.IpAddress,
