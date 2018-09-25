@@ -230,6 +230,8 @@ func main() {
 					log.Fatal(err)
 				}
 
+				fmt.Printf("summaries -> %+v\n", summaries)
+
 				// if vm is powered on
 				ps, err := hvm.PowerState(ctx)
 				if err != nil {
