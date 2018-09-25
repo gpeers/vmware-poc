@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/vim25/types"
+	"strconv"
 )
 
 // getEnvString returns string from environment variable.
@@ -240,7 +241,7 @@ func main() {
 				if ps == types.VirtualMachinePowerStatePoweredOn {
 					fmt.Println("vm is powered on...")
 					fmt.Printf("ip -> %s \n", data.Guest.IpAddress)
-					vmReporter["json"]["file"] = "output" + string(i) + ".json"
+					vmReporter["json"]["file"] = "output" + strconv.Itoa(i) + ".json"
 
 					t := TargetConfig{
 						Target:   data.Guest.IpAddress,
