@@ -185,7 +185,7 @@ func main() {
 	// set up InSpec reporter
 	var vmReporter = map[string]map[string]interface{}{}
 	vmReporter["cli"] = map[string]interface{}{}
-	vmReporter["json"] = map[string]interface{}{}
+	vmReporter["json-min"] = map[string]interface{}{}
 	vmReporter["cli"]["stdout"] = true
 	vmReporter["json-min"]["file"] = "output.json"
 	vmReporter["json-min"]["stdout"] = false
